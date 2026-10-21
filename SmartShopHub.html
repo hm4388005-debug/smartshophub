@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
+ <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#14213d">
@@ -134,11 +135,60 @@ $("searchForm").addEventListener("submit",e=>{e.preventDefault();query=$("search
 $("searchInput").addEventListener("input",()=>{query=$("searchInput").value.trim();renderProducts()});
 $("language").addEventListener("change",e=>setLanguage(e.target.value));$("currency").addEventListener("change",e=>{currency=e.target.value;renderProducts();if($("drawerBg").classList.contains("show"))renderCart()});
 $("sort").addEventListener("change",renderProducts);$("openCart").onclick=openCart;$("closeCart").onclick=closeCart;$("detailClose").onclick=()=>$("productDetail").classList.remove("show");$("productDetail").addEventListener("click",e=>{if(e.target===$("productDetail"))$("productDetail").classList.remove("show")});$("drawerBg").addEventListener("click",e=>{if(e.target===$("drawerBg"))closeCart()});
-$("checkoutClose").onclick=()=>$("checkoutModal").classList.remove("show");$("checkoutModal").addEventListener("click",e=>{if(e.target===$("checkoutModal"))$("checkoutModal").classList.remove("show")});$("checkoutForm").addEventListener("submit",e=>{e.preventDefault();toast("Checkout details validated. Secure payment provider is not connected yet.");});
+$("checkoutClose").onclick=()=>$("checkoutModal").classList.remove("show");$("checkoutModal").addEventListener("click",e=>{if(e.target===$("checkoutModal"))$("checkoutModal").classList.remove("show")});$("checkoutForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const data = new FormData(form);
+
+  const items = Object.entries(cart).map(([id, units]) => {
+    const p = products.find(item => String(item.id) === String(id));
+    return p ? {
+      name: productName(p),
+      units: Number(units),
+      price: Number(p.price) * Number(units)
+    } : null;
+  }).filter(Boolean);
+
+  if (!items.length) {
+    toast("Please add products to your cart first.");
+    return;
+  }
+
+  const total = items.reduce((sum, item) => sum + item.price, 0);
+
+  try {
+    await emailjs.send(
+      "service_p0vnr4q",
+      "template_hhk0hqn",
+      {
+        order_id: "SSH-" + Date.now(),
+        email: data.get("email"),
+        orders: items,
+        cost: {
+          shipping: 0,
+          tax: 0,
+          total: total
+        },
+        customer_name: data.get("fullName"),
+        country: data.get("country"),
+        address: data.get("address")
+      }
+    );
+
+    toast("Order email sent successfully!");
+  } catch (error) {
+    console.error(error);
+    toast("Email failed. Check EmailJS settings.");
+  }
+});
 $("shopNow").onclick=()=>$("products").scrollIntoView({behavior:"smooth"});
 $("accountBtn").onclick=()=>toast(t("accountNotice"));$("sellerBtn").onclick=()=>toast(t("sellerNotice"));$("helpBtn").onclick=()=>toast(t("helpNotice"));
 $("returnsLink").onclick=e=>{e.preventDefault();toast(t("helpNotice"))};$("trackingLink").onclick=e=>{e.preventDefault();toast(t("helpNotice"))};$("privacyLink").onclick=e=>{e.preventDefault();toast(t("demoNotice"))};
-renderCategories();renderProducts();
+emailjs.init({
+  publicKey: "gVh7f_gqqcZ8HTgmI"
+});
+ renderCategories();renderProducts();
 </script>
 </body>
 </html>
