@@ -273,8 +273,30 @@ districtSelect.addEventListener("change", () => {
 });
 
 upazilaSelect.addEventListener("change", () => {
-  unionSelect.innerHTML = '<option value="">ইউনিয়নের তালিকা পরের ধাপে যোগ হবে</option>';
-  unionSelect.disabled = true;
+  const unionsByUpazila = {
+  "সাভার": [
+    "আশুলিয়া",
+    "বনগাঁও",
+    "ভাকুর্তা",
+    "ধামসোনা",
+    "কাউন্দিয়া",
+    "পাথালিয়া",
+    "সাভার",
+    "শিমুলিয়া",
+    "তেঁতুলঝোড়া",
+    "ইয়ারপুর"
+  ]
+};
+
+unionSelect.innerHTML = '<option value="">ইউনিয়ন নির্বাচন করুন</option>';
+
+const unions = unionsByUpazila[upazilaSelect.value] || [];
+
+unions.forEach(union => {
+  unionSelect.add(new Option(union, union));
+});
+
+unionSelect.disabled = unions.length === 0;
 });
 </script>
 </body>
