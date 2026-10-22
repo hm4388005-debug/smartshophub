@@ -226,77 +226,82 @@ const districtSelect = document.getElementById("district");
 const upazilaSelect = document.getElementById("upazila");
 const unionSelect = document.getElementById("union");
 
-const districtsByDivision = {
-  "ঢাকা": ["ঢাকা", "গাজীপুর", "নারায়ণগঞ্জ", "নরসিংদী", "মুন্সিগঞ্জ", "মানিকগঞ্জ", "মাদারীপুর", "গোপালগঞ্জ", "ফরিদপুর", "রাজবাড়ী", "শরীয়তপুর", "টাঙ্গাইল", "কিশোরগঞ্জ", "জামালপুর", "শেরপুর", "ময়মনসিংহ", "নেত্রকোনা"],
-  "চট্টগ্রাম": ["চট্টগ্রাম", "কক্সবাজার", "কুমিল্লা", "ব্রাহ্মণবাড়িয়া", "চাঁদপুর", "লক্ষ্মীপুর", "নোয়াখালী", "ফেনী", "খাগড়াছড়ি", "রাঙামাটি", "বান্দরবান"],
-  "রাজশাহী": ["রাজশাহী", "বগুড়া", "জয়পুরহাট", "নওগাঁ", "নাটোর", "চাঁপাইনবাবগঞ্জ", "পাবনা", "সিরাজগঞ্জ"],
-  "খুলনা": ["খুলনা", "বাগেরহাট", "সাতক্ষীরা", "যশোর", "ঝিনাইদহ", "মাগুরা", "নড়াইল", "কুষ্টিয়া", "চুয়াডাঙ্গা", "মেহেরপুর"],
-  "বরিশাল": ["বরিশাল", "বরগুনা", "ভোলা", "ঝালকাঠি", "পটুয়াখালী", "পিরোজপুর"],
-  "সিলেট": ["সিলেট", "মৌলভীবাজার", "হবিগঞ্জ", "সুনামগঞ্জ"],
-  "রংপুর": ["রংপুর", "দিনাজপুর", "কুড়িগ্রাম", "গাইবান্ধা", "লালমনিরহাট", "নীলফামারী", "পঞ্চগড়", "ঠাকুরগাঁও"],
-  "ময়মনসিংহ": ["ময়মনসিংহ", "জামালপুর", "শেরপুর", "নেত্রকোনা"]
-};
+let bdLocations = [];
+
+const locationUrl = "https://iqbalhasandev.github.io/bangladesh-geo-json/bangladesh-geo.json";
+
+function fillSelect(select, placeholder, items, labelFn, valueFn) {
+  select.innerHTML = "";
+  select.add(new Option(placeholder, ""));
+
+  items.forEach(item => {
+    select.add(new Option(labelFn(item), valueFn(item)));
+  });
+}
+
+divisionSelect.disabled = true;
+districtSelect.disabled = true;
+upazilaSelect.disabled = true;
+unionSelect.disabled = true;
+
+fetch(locationUrl)
+  .then(response => {
+    if (!response.ok) throw new Error("Data load failed");
+    return response.json();
+  })
+  .then(data => {
+    bdLocations = data;
+    fillSelect(divisionSelect, "বিভাগ নির্বাচন করুন", bdLocations,
+      item => item.bn_name || item.name, item => item.name);
+    divisionSelect.disabled = false;
+  })
+  .catch(error => {
+    console.error(error);
+    alert("ঠিকানার তালিকা লোড হয়নি। ইন্টারনেট পরীক্ষা করুন।");
+  });
 
 divisionSelect.addEventListener("change", () => {
-  districtSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
-  upazilaSelect.innerHTML = '<option value="">আগে জেলা নির্বাচন করুন</option>';
-  unionSelect.innerHTML = '<option value="">আগে উপজেলা নির্বাচন করুন</option>';
-  districtSelect.disabled = true;
+  const division = bdLocations.find(item => item.name === divisionSelect.value);
+  const districts = division ? division.districts || [] : [];
+
+  fillSelect(districtSelect, "জেলা নির্বাচন করুন", districts,
+    item => item.bn_name || item.name, item => item.name);
+  fillSelect(upazilaSelect, "আগে জেলা নির্বাচন করুন", [], item => item.name, item => item.name);
+  fillSelect(unionSelect, "আগে উপজেলা নির্বাচন করুন", [], item => item.name, item => item.name);
+
+  districtSelect.disabled = districts.length === 0;
   upazilaSelect.disabled = true;
   unionSelect.disabled = true;
-
-  (districtsByDivision[divisionSelect.value] || []).forEach(district => {
-    districtSelect.add(new Option(district, district));
-  });
-
-  districtSelect.disabled = false;
 });
-const upazilasByDistrict = {
-  "ঢাকা": ["ধামরাই", "দোহার", "কেরানীগঞ্জ", "নবাবগঞ্জ", "সাভার"],
-  "গাজীপুর": ["গাজীপুর সদর", "কালিয়াকৈর", "কালীগঞ্জ", "কাপাসিয়া", "শ্রীপুর"],
-  "সিরাজগঞ্জ": ["সিরাজগঞ্জ সদর", "বেলকুচি", "চৌহালী", "কামারখন্দ", "কাজীপুর", "রায়গঞ্জ", "শাহজাদপুর", "তারাশ", "উল্লাপাড়া"],
-  "চট্টগ্রাম": ["আনোয়ারা", "বাঁশখালী", "বোয়ালখালী", "চন্দনাইশ", "ফটিকছড়ি", "হাটহাজারী", "লোহাগাড়া", "মীরসরাই", "পটিয়া", "রাঙ্গুনিয়া", "রাউজান", "সন্দ্বীপ", "সাতকানিয়া", "সীতাকুণ্ড"],
-  "রাজশাহী": ["বাঘা", "বাগমারা", "চারঘাট", "দুর্গাপুর", "গোদাগাড়ী", "মোহনপুর", "পবা", "পুঠিয়া", "তানোর"]
-};
 
 districtSelect.addEventListener("change", () => {
-  upazilaSelect.innerHTML = '<option value="">উপজেলা/থানা নির্বাচন করুন</option>';
-  unionSelect.innerHTML = '<option value="">আগে উপজেলা নির্বাচন করুন</option>';
-  unionSelect.disabled = true;
+  const division = bdLocations.find(item => item.name === divisionSelect.value);
+  const district = division
+    ? (division.districts || []).find(item => item.name === districtSelect.value)
+    : null;
+  const upazilas = district ? district.upazilas || [] : [];
 
-  const upazilas = upazilasByDistrict[districtSelect.value] || [];
-  upazilas.forEach(upazila => {
-    upazilaSelect.add(new Option(upazila, upazila));
-  });
+  fillSelect(upazilaSelect, "উপজেলা/থানা নির্বাচন করুন", upazilas,
+    item => item.bn_name || item.name, item => item.name);
+  fillSelect(unionSelect, "আগে উপজেলা নির্বাচন করুন", [], item => item.name, item => item.name);
 
   upazilaSelect.disabled = upazilas.length === 0;
+  unionSelect.disabled = true;
 });
 
 upazilaSelect.addEventListener("change", () => {
-  const unionsByUpazila = {
-  "সাভার": [
-    "আশুলিয়া",
-    "বনগাঁও",
-    "ভাকুর্তা",
-    "ধামসোনা",
-    "কাউন্দিয়া",
-    "পাথালিয়া",
-    "সাভার",
-    "শিমুলিয়া",
-    "তেঁতুলঝোড়া",
-    "ইয়ারপুর"
-  ]
-};
+  const division = bdLocations.find(item => item.name === divisionSelect.value);
+  const district = division
+    ? (division.districts || []).find(item => item.name === districtSelect.value)
+    : null;
+  const upazila = district
+    ? (district.upazilas || []).find(item => item.name === upazilaSelect.value)
+    : null;
+  const unions = upazila ? upazila.unions || [] : [];
 
-unionSelect.innerHTML = '<option value="">ইউনিয়ন নির্বাচন করুন</option>';
-
-const unions = unionsByUpazila[upazilaSelect.value] || [];
-
-unions.forEach(union => {
-  unionSelect.add(new Option(union, union));
-});
-
-unionSelect.disabled = unions.length === 0;
+  fillSelect(unionSelect, "ইউনিয়ন নির্বাচন করুন", unions,
+    item => item.bn_name || item.name, item => item.name);
+  unionSelect.disabled = unions.length === 0;
 });
 </script>
 </body>
