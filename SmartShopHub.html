@@ -201,10 +201,16 @@ $("checkoutClose").onclick=()=>$("checkoutModal").classList.remove("show");$("ch
           tax: 0,
           total: total
         },
-        customer_name: data.get("fullName"),
-       phone: data.get("phone"),
-        country: data.get("country"),
-        address: data.get("address")
+       customer_name: data.get("fullName"),
+phone: data.get("phone"),
+customer_email: data.get("email"),
+country: data.get("country"),
+division: data.get("division"),
+district: data.get("district"),
+upazila: data.get("upazila"),
+union: data.get("union"),
+address: data.get("address"),
+delivery_address: data.get("address") 
       }
     );
 
