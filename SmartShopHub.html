@@ -187,13 +187,37 @@ $("checkoutClose").onclick=()=>$("checkoutModal").classList.remove("show");$("ch
   }
 
   const total = items.reduce((sum, item) => sum + item.price, 0);
-
+const orderId = "SSH-" + Date.now();
   try {
-    await emailjs.send(
+    await fetch(SHEETS_WEB_APP_URL, {
+  method: "POST",
+  mode: "no-cors",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: JSON.stringify({
+    orderId: orderId,
+    fullName: data.get("fullName"),
+    phone: data.get("phone"),
+    email: data.get("email"),
+    product: items.map(item => item.name).join(", "),
+    quantity: items.reduce((sum, item) => sum + item.units, 0),
+    total: total,
+    address: [
+      data.get("country"),
+      data.get("division"),
+      data.get("district"),
+      data.get("upazila"),
+      data.get("union"),
+      data.get("address")
+    ].filter(Boolean).join(", ")
+  })
+});
+   await emailjs.send(
       "service_p0vnr4q",
       "template_hhk0hqn",
       {
-        order_id: "SSH-" + Date.now(),
+        order_id: orderId,
         email: data.get("email"),
         orders: items,
         cost: {
@@ -223,7 +247,8 @@ delivery_address: data.get("address")
 $("shopNow").onclick=()=>$("products").scrollIntoView({behavior:"smooth"});
 $("accountBtn").onclick=()=>toast(t("accountNotice"));$("sellerBtn").onclick=()=>toast(t("sellerNotice"));$("helpBtn").onclick=()=>toast(t("helpNotice"));
 $("returnsLink").onclick=e=>{e.preventDefault();toast(t("helpNotice"))};$("trackingLink").onclick=e=>{e.preventDefault();toast(t("helpNotice"))};$("privacyLink").onclick=e=>{e.preventDefault();toast(t("demoNotice"))};
-emailjs.init({
+const SHEETS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyT6l79xhH7JQLeqmj6eo88RrCVXUvAhtEn3q_uZJvraO0tBi3LSNUhGQPr8zGqmr6e/exec";
+ emailjs.init({
   publicKey: "gVh7f_gqqcZ8HTgmI"
 });
  renderCategories();renderProducts();
