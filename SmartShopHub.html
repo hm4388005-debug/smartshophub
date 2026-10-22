@@ -73,7 +73,37 @@ footer{background:var(--navy);color:white;margin-top:40px;padding:35px 0 90px}.f
 <div class="drawer-bg" id="drawerBg"><aside class="drawer" role="dialog" aria-modal="true" aria-label="Shopping cart"><div class="drawer-head"><h2 id="drawerTitle">🛒 আপনার কার্ট</h2><button class="close" id="closeCart">✕</button></div><div id="cartItems"></div><div id="cartBottom"></div></aside></div>
 <div class="product-detail" id="productDetail" role="dialog" aria-modal="true" aria-label="Product details"><div class="detail-card"><button class="detail-close" id="detailClose" aria-label="Close">✕</button><div class="detail-photo" id="detailPhoto">🛍️</div><div class="detail-info"><div class="category-label" id="detailCategory"></div><h2 id="detailName"></h2><div class="rating" id="detailRating"></div><div class="detail-price" id="detailPrice"></div><p class="detail-desc" id="detailDescription"></p><button class="add" id="detailAdd">＋ কার্টে যোগ করুন</button></div></div></div>
 <div class="product-detail" id="checkoutModal" role="dialog" aria-modal="true" aria-label="Checkout"><div class="detail-card checkout-card"><button class="detail-close" id="checkoutClose" aria-label="Close">✕</button><div class="detail-info checkout-info"><div class="category-label">🌍 INTERNATIONAL CHECKOUT</div><h2>Complete your order</h2><p class="detail-desc">Delivery and payment options depend on your country and the seller.</p><form id="checkoutForm" class="checkout-form"><label>Full name<input name="fullName" autocomplete="name" required placeholder="Your full name"></label>
-<label>Mobile phone number<input name="phone" type="tel" autocomplete="tel" required placeholder="01XXXXXXXXX" pattern="01[3-9][0-9]{8}" title="Enter a valid Bangladesh mobile number"></label> <label>Email address<input name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label><label>Delivery country<select name="country" required><option value="">Select country</option><option>Bangladesh</option><option>United States</option><option>United Kingdom</option><option>Canada</option><option>Australia</option><option>India</option><option>Pakistan</option><option>Saudi Arabia</option><option>United Arab Emirates</option><option>Other country</option></select></label><label>Delivery address<textarea name="address" autocomplete="street-address" required placeholder="Street, city, area"></textarea></label><div class="payment-heading">Card payment methods (planned)</div><div class="card-brands"><span>VISA</span><span>Mastercard</span><span>AMEX</span><span>Discover</span><span>JCB</span><span>UnionPay</span></div><p class="notice">🔒 This prototype does not collect or store card numbers. To accept real payments, SmartShopHub must connect a supported secure payment provider. Availability varies by country and card issuer.</p><button class="checkout" type="submit">Continue to secure payment →</button></form></div></div></div>
+<label>Mobile phone number<input name="phone" type="tel" autocomplete="tel" required placeholder="01XXXXXXXXX" pattern="01[3-9][0-9]{8}" title="Enter a valid Bangladesh mobile number"></label> <label>Email address<input name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label><label>Delivery country<select name="country" required><option value="">Select country</option><option>Bangladesh</option><option>United States</option><option>United Kingdom</option><option>Canada</option><option>Australia</option><option>India</option><option>Pakistan</option><option>Saudi Arabia</option><option>United Arab Emirates</option><option>Other country</option></select></label><label>Delivery address<textarea name="address" autocomplete="street-address" required placeholder="Street, city, area"></textarea></label><label>বিভাগ (Division)
+<select name="division" id="division" required>
+<option value="">বিভাগ নির্বাচন করুন</option>
+ <option value="ঢাকা">ঢাকা</option>
+<option value="চট্টগ্রাম">চট্টগ্রাম</option>
+<option value="রাজশাহী">রাজশাহী</option>
+<option value="খুলনা">খুলনা</option>
+<option value="বরিশাল">বরিশাল</option>
+<option value="সিলেট">সিলেট</option>
+<option value="রংপুর">রংপুর</option>
+<option value="ময়মনসিংহ">ময়মনসিংহ</option>
+</select>
+</label>
+
+<label>জেলা (District)
+<select name="district" id="district" required disabled>
+<option value="">আগে বিভাগ নির্বাচন করুন</option>
+</select>
+</label>
+
+<label>উপজেলা/থানা (Upazila/Thana)
+<select name="upazila" id="upazila" required disabled>
+<option value="">আগে জেলা নির্বাচন করুন</option>
+</select>
+</label>
+
+<label>ইউনিয়ন (Union)
+<select name="union" id="union" disabled>
+<option value="">আগে উপজেলা নির্বাচন করুন</option>
+</select>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </label><div class="payment-heading">Card payment methods (planned)</div><div class="card-brands"><span>VISA</span><span>Mastercard</span><span>AMEX</span><span>Discover</span><span>JCB</span><span>UnionPay</span></div><p class="notice">🔒 This prototype does not collect or store card numbers. To accept real payments, SmartShopHub must connect a supported secure payment provider. Availability varies by country and card issuer.</p><button class="checkout" type="submit">Continue to secure payment →</button></form></div></div></div>
 <div class="toast" id="toast" role="status"></div>
 <script>
 const products=[
@@ -191,6 +221,36 @@ emailjs.init({
   publicKey: "gVh7f_gqqcZ8HTgmI"
 });
  renderCategories();renderProducts();
+const divisionSelect = document.getElementById("division");
+const districtSelect = document.getElementById("district");
+const upazilaSelect = document.getElementById("upazila");
+const unionSelect = document.getElementById("union");
+
+const districtsByDivision = {
+  "ঢাকা": ["ঢাকা", "গাজীপুর", "নারায়ণগঞ্জ", "নরসিংদী", "মুন্সিগঞ্জ", "মানিকগঞ্জ", "মাদারীপুর", "গোপালগঞ্জ", "ফরিদপুর", "রাজবাড়ী", "শরীয়তপুর", "টাঙ্গাইল", "কিশোরগঞ্জ", "জামালপুর", "শেরপুর", "ময়মনসিংহ", "নেত্রকোনা"],
+  "চট্টগ্রাম": ["চট্টগ্রাম", "কক্সবাজার", "কুমিল্লা", "ব্রাহ্মণবাড়িয়া", "চাঁদপুর", "লক্ষ্মীপুর", "নোয়াখালী", "ফেনী", "খাগড়াছড়ি", "রাঙামাটি", "বান্দরবান"],
+  "রাজশাহী": ["রাজশাহী", "বগুড়া", "জয়পুরহাট", "নওগাঁ", "নাটোর", "চাঁপাইনবাবগঞ্জ", "পাবনা", "সিরাজগঞ্জ"],
+  "খুলনা": ["খুলনা", "বাগেরহাট", "সাতক্ষীরা", "যশোর", "ঝিনাইদহ", "মাগুরা", "নড়াইল", "কুষ্টিয়া", "চুয়াডাঙ্গা", "মেহেরপুর"],
+  "বরিশাল": ["বরিশাল", "বরগুনা", "ভোলা", "ঝালকাঠি", "পটুয়াখালী", "পিরোজপুর"],
+  "সিলেট": ["সিলেট", "মৌলভীবাজার", "হবিগঞ্জ", "সুনামগঞ্জ"],
+  "রংপুর": ["রংপুর", "দিনাজপুর", "কুড়িগ্রাম", "গাইবান্ধা", "লালমনিরহাট", "নীলফামারী", "পঞ্চগড়", "ঠাকুরগাঁও"],
+  "ময়মনসিংহ": ["ময়মনসিংহ", "জামালপুর", "শেরপুর", "নেত্রকোনা"]
+};
+
+divisionSelect.addEventListener("change", () => {
+  districtSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
+  upazilaSelect.innerHTML = '<option value="">আগে জেলা নির্বাচন করুন</option>';
+  unionSelect.innerHTML = '<option value="">আগে উপজেলা নির্বাচন করুন</option>';
+  districtSelect.disabled = true;
+  upazilaSelect.disabled = true;
+  unionSelect.disabled = true;
+
+  (districtsByDivision[divisionSelect.value] || []).forEach(district => {
+    districtSelect.add(new Option(district, district));
+  });
+
+  districtSelect.disabled = false;
+});
 </script>
 </body>
 </html>
