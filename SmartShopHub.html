@@ -171,7 +171,8 @@ $("checkoutClose").onclick=()=>$("checkoutModal").classList.remove("show");$("ch
 
   const form = e.currentTarget;
   const data = new FormData(form);
-
+  alert(JSON.stringify([...data.entries()]));
+ return;
   const items = Object.entries(cart).map(([id, units]) => {
     const p = products.find(item => String(item.id) === String(id));
     return p ? {
