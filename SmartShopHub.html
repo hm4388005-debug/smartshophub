@@ -104,7 +104,14 @@ footer{background:var(--navy);color:white;margin-top:40px;padding:35px 0 90px}.f
 <select name="union" id="union" disabled>
 <option value="">আগে উপজেলা নির্বাচন করুন</option>
 </select>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </label><div class="payment-heading">Card payment methods (planned)</div><div class="card-brands"><span>VISA</span><span>Mastercard</span><span>AMEX</span><span>Discover</span><span>JCB</span><span>UnionPay</span></div><p class="notice">🔒 This prototype does not collect or store card numbers. To accept real payments, SmartShopHub must connect a supported secure payment provider. Availability varies by country and card issuer.</p><button class="checkout" type="submit">Continue to secure payment →</button></form></div></div></div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </label><div class="payment-heading"><div class="payment-heading">পেমেন্ট পদ্ধতি (Payment Method)</div>
+<label class="payment-option">
+  <input type="radio" name="paymentMethod" value="Cash on Delivery" checked required>
+  <span>Cash on Delivery (COD)</span>
+  <p>পণ্য হাতে পাওয়ার পরে নগদ টাকা পরিশোধ করুন।</p>
+</label>
+<p class="notice">আপনার অর্ডার জমা দিন। পণ্য ডেলিভারির সময় টাকা পরিশোধ করবেন।</p>
+<button class="checkout" type="submit">অর্ডার নিশ্চিত করুন →</button></form></div></div></div>
 <div class="toast" id="toast" role="status"></div>
 <script>
 const products=[
